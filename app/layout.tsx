@@ -13,11 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Starter Project",
-  description: " starting point for building your site.",
-  other: {
-    "codex-preview": "development",
-  },
+  title: "Rookie ADP Hit Rates",
+  description:
+    "Fantasy football rookie hit rates by draft position and positional group.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
