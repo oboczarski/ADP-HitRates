@@ -132,13 +132,13 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .method-definition span, .benchmark-copy span { color: #69738a; font-size: 11px; font-weight: 850; letter-spacing: .17em; }
 .method-definition strong { display: block; color: #e0e4ed; margin-top: 9px; font-size: 13px; }.method-definition p { color: #69738a; font-size: 11px; margin: 5px 0 0; }
 .threshold-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.threshold-item { min-width: 0; align-content: center; place-items: center; padding-right: 8px; border-right: 1px solid rgba(255,255,255,.06); }.threshold-item:last-child { border: 0; }
+.threshold-item { display: grid; min-width: 0; align-content: center; place-items: center; padding-right: 8px; border-right: 1px solid rgba(255,255,255,.06); }.threshold-item:last-child { border: 0; }
 .threshold-item span { display: block; font-size: 13px; font-weight: 900; letter-spacing: .08em; }.threshold-item strong { display: block; margin-top: 6px; font-size: 16px; }.threshold-item small { display: block; margin-top: 3px; color: #596278; font-size: 8px; }
 .benchmark-copy p { margin: 8px 0 0; color: #727d95; font-size: 10px; line-height: 1.55; }.benchmark-copy strong { color: #b8c0d2; }
 .dataset-parameters { display: flex; flex-direction: column; justify-content: center; gap: 11px; min-width: 0; }
 .dataset-title { color: #69738a; font-size: 11px; font-weight: 850; letter-spacing: .15em; }
 .dataset-parameter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.dataset-parameter { min-width: 0; padding-right: 7px; border-right: 1px solid rgba(255,255,255,.06); }
+.dataset-parameter { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; padding-right: 7px; border-right: 1px solid rgba(255,255,255,.06); }
 .dataset-parameter:last-child { padding-right: 0; border-right: 0; }
 .dataset-parameter span { display: block; color: #5f6980; font-size: 10px; font-weight: 850; letter-spacing:  -0.02em; white-space: nowrap; }
 .dataset-parameter strong { display: block; margin-top: 7px; font-size: 13px; line-height: 1; letter-spacing: -.02em; white-space: nowrap; justify-self: center; }
