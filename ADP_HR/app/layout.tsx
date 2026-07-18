@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Starter Project",
-  description: "A clean starting point for building your site.",
+  description: " starting point for building your site.",
   other: {
     "codex-preview": "development",
   },
