@@ -112,7 +112,7 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .signal-ring { width: 148px; height: 148px; border-radius: 50%; padding: 1px; background: conic-gradient(from 210deg, #00ddfa, #4d79ff, #d747ff, #ff0aa5, rgba(255,255,255,.08) 72%, #00ddfa); box-shadow: 0 0 40px rgba(167,78,255,.16); position: relative; }
 .signal-ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: radial-gradient(circle at 35% 28%, #121d39, #060b17 70%); border: 1px solid rgba(255,255,255,.09); }
 .signal-ring span { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; text-align: center; font-size: 35px; font-weight: 780; letter-spacing: -.05em; }
-.signal-ring small { display: block; color: #7d86a0; font-size: 8px; letter-spacing: .2em; margin-top: 4px; }
+.signal-ring small { display: block; color: #7d86a0; font-size: 18px; letter-spacing: .2em; margin-top: -12px; }
 .insight-hero h2 { margin: 5px 0 8px; font-size: 23px; letter-spacing: -.03em; }
 .insight-hero > p { margin: 0; color: #818ba3; font-size: 12px; line-height: 1.65; }
 .insight-hero > p strong { color: #cfd5e4; }
