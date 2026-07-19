@@ -298,6 +298,7 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .stat-status { flex: 0 0 auto; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 9px var(--accent); }
 .stat-note strong { flex: 1 1 auto; overflow: hidden; min-width: 0; font-size: 10px; line-height: 1.2; letter-spacing: -.01em; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .stat-note small { flex: 0 0 auto; margin-left: auto; color: #717d95; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 8px; letter-spacing: .06em; font-weight: 750; }
+.stat-note-mobile { display: none; }
 
 .panel { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(12,20,39,.86), rgba(4,9,20,.87)); box-shadow: inset 0 1px rgba(255,255,255,.04), 0 30px 100px rgba(0,0,0,.22); }
 .trend-panel { padding: 28px 30px 20px; }
@@ -401,26 +402,41 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   .hero h1 { margin: 10px 0 11px; font-size: clamp(40px, 12.3vw, 48px); }
   .hero p { font-size: 12px; line-height: 1.5; letter-spacing: -.05em; }
 
-  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0 0 12px; }
-  .stat-card { --dial-size: clamp(98px, 26.5vw, 148px); --ring-inset: 5px; --ring-width: 8px; min-height: clamp(184px, 46vw, 258px); padding: 11px 11px 10px; border-radius: 17px; }
-  .stat-card::before { width: 138px; height: 138px; filter: blur(17px); }
-  .stat-heading { gap: 4px; }
-  .stat-kicker { font-size: 7px; letter-spacing: .14em; }
-  .stat-heading strong { font-size: 9.5px; letter-spacing: .09em; }
-  .stat-index { gap: 4px; min-width: 32px; padding: 4px 5px; font-size: 7px; }
-  .stat-index i { width: 3px; height: 3px; }
-  .stat-dial { margin: 7px auto 6px; }
-  .stat-core { inset: calc(var(--ring-inset) + var(--ring-width) + 5px); box-shadow: inset 0 1px 1px rgba(255,255,255,.09), inset 0 -13px 20px rgba(0,0,0,.5), inset 0 0 16px rgba(var(--accent-rgb),.055), 0 0 0 3px rgba(3,7,17,.48), 0 9px 18px rgba(0,0,0,.3); }
-  .stat-arc-echo { inset: calc(var(--ring-inset) + var(--ring-width) + 3px); }
-  .stat-origin { top: calc(var(--ring-inset) + 1.5px); }
-  .stat-cap::after { top: 0; width: 7px; height: 7px; }
-  .stat-value { font-size: 23px; }
-  .stat-value small { margin-left: 1px; font-size: 10px; }
-  .stat-core em { margin-top: 5px; font-size: 6.5px; letter-spacing: .12em; }
-  .stat-note { gap: 5px; padding-top: 7px; }
-  .stat-status { width: 4px; height: 4px; }
-  .stat-note strong { font-size: 9px; }
+  .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(3px, 1vw, 6px); margin: 0 0 12px; }
+  .stat-card {
+    --dial-size: clamp(58px, 18vw, 82px);
+    --ring-inset: 3px;
+    --ring-width: 5px;
+    min-height: clamp(118px, 31vw, 144px);
+    padding: clamp(6px, 1.8vw, 9px) clamp(4px, 1.2vw, 7px) clamp(6px, 1.6vw, 8px);
+    border-radius: clamp(12px, 3vw, 16px);
+  }
+  .stat-card::before { width: calc(var(--dial-size) + 18px); height: calc(var(--dial-size) + 18px); filter: blur(12px); opacity: .48; }
+  .stat-card::after { left: 18%; width: 64%; }
+  .stat-top { align-items: center; justify-content: center; gap: 0; min-height: 10px; }
+  .stat-heading { width: 100%; gap: 0; text-align: center; }
+  .stat-kicker { display: none; }
+  .stat-heading strong { overflow: hidden; font-size: clamp(7.5px, 2.1vw, 10px); letter-spacing: .04em; text-overflow: clip; }
+  .stat-index { position: absolute; top: 0; right: 0; gap: 0; width: 4px; height: 4px; min-width: 0; padding: 0; border: 0; background: transparent; box-shadow: none; font-size: 0; }
+  .stat-index i { width: 4px; height: 4px; }
+  .stat-dial { margin: clamp(3px, 1vw, 5px) auto; filter: drop-shadow(0 7px 13px rgba(var(--accent-rgb),.18)); }
+  .stat-dial::after { box-shadow: inset 0 0 5px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.025), 0 0 10px rgba(0,0,0,.3); }
+  .stat-arc { filter: drop-shadow(0 0 5px rgba(var(--accent-rgb),.46)); }
+  .stat-arc-glow { filter: blur(3px); opacity: .42; }
+  .stat-arc-echo { inset: calc(var(--ring-inset) + var(--ring-width) + 2px); }
+  .stat-origin { top: var(--ring-inset); width: 3px; height: 3px; box-shadow: 0 0 4px rgba(var(--accent-rgb),.6); }
+  .stat-cap::after { top: -1px; width: 5px; height: 5px; border-width: 1px; box-shadow: 0 0 4px var(--ring-end), 0 0 8px rgba(var(--accent-rgb),.55); }
+  .stat-core { inset: calc(var(--ring-inset) + var(--ring-width) + 3px); box-shadow: inset 0 1px 1px rgba(255,255,255,.09), inset 0 -9px 14px rgba(0,0,0,.5), inset 0 0 10px rgba(var(--accent-rgb),.06), 0 0 0 2px rgba(3,7,17,.48), 0 6px 12px rgba(0,0,0,.3); }
+  .stat-core::after { inset: 3px; }
+  .stat-value { font-size: clamp(14px, 4.2vw, 18px); letter-spacing: -.065em; }
+  .stat-value small { margin-left: 1px; font-size: clamp(6px, 1.8vw, 8px); }
+  .stat-core em { margin-top: 2px; font-size: clamp(3.5px, 1vw, 5px); letter-spacing: .06em; }
+  .stat-note { justify-content: center; gap: 3px; min-height: 12px; padding-top: clamp(4px, 1.2vw, 6px); }
+  .stat-status { width: 3px; height: 3px; }
+  .stat-note strong { flex: 0 1 auto; overflow: visible; font-size: clamp(5.5px, 1.65vw, 8px); line-height: 1; letter-spacing: .025em; text-transform: uppercase; text-overflow: clip; }
   .stat-note small { display: none; }
+  .stat-note-desktop { display: none; }
+  .stat-note-mobile { display: inline; }
 
   .panel-header { gap: 6px; padding: 0 14px; }
   .panel-header h2 { margin: 2px 0; font-size: 18px; }

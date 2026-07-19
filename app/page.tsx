@@ -36,9 +36,17 @@ const statCardNotes = {
   "Round 3": "High-risk range",
 } satisfies Record<DraftRange, string>;
 
+const statCardMobileNotes = {
+  "Top 6": "Premium",
+  "Round 1": "Strong",
+  "Round 2": "Coin flip",
+  "Round 3": "High risk",
+} satisfies Record<DraftRange, string>;
+
 const statCards = overallData.map((metric, index) => ({
   ...metric,
   note: statCardNotes[metric.range],
+  mobileNote: statCardMobileNotes[metric.range],
   sequence: String(index + 1).padStart(2, "0"),
 }));
 
@@ -232,7 +240,7 @@ export default function Home() {
         </section>
 
         <section className="stat-grid" aria-label="Overall hit probability summary">
-          {statCards.map(({ range, overall, note, sequence }, index) => {
+          {statCards.map(({ range, overall, note, mobileNote, sequence }, index) => {
             const arcEnd = overall * 3.6;
             const dialStyle = {
               "--arc-end": `${arcEnd}deg`,
@@ -279,7 +287,10 @@ export default function Home() {
 
                 <div className="stat-note" id={noteId}>
                   <span className="stat-status" aria-hidden="true" />
-                  <strong>{note}</strong>
+                  <strong>
+                    <span className="stat-note-desktop">{note}</span>
+                    <span className="stat-note-mobile">{mobileNote}</span>
+                  </strong>
                   <small aria-hidden="true">0—100</small>
                 </div>
               </article>
