@@ -234,8 +234,7 @@ export default function Home() {
           <div className="eyebrow"><span>CAREER HIT STUDY</span><i /></div>
           <h1>Draft capital has a<br /><em>measurable edge.</em></h1>
           <p>
-            Positional hit rates across eight rookie classes—tracking whether each
-            player cleared their position-specific fantasy threshold at least once.
+            Positional hit rates across eight rookie classes— Highlighting overall and positional hit probabilities across rookie draft ADP .
           </p>
         </section>
 
