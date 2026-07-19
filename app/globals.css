@@ -178,7 +178,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   .panel-header { gap: 6px; padding: 0 14px; }
   .panel-header h2 { margin: 2px 0; font-size: 18px; }
   .panel-header p { margin: 4px 0 2px 1px; font-size: 9px; line-height: 1.35; white-space: nowrap; }
-  .section-index { font-size: 7.5px; }
+  .section-index { font-size: 8.5px; }
 
   .trend-panel { padding: 9px 4px; }
   .trend-chart { width: calc(100% + 7px); height: 410px; margin-top: 0; margin-left: -5px; }
@@ -202,7 +202,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   .range-legend { width: 100%; flex-wrap: nowrap; justify-content: flex-start; gap: 8px; }
   .bar-chart { width: calc(100% + 7px); height: 390px; margin-top: 0; margin-left: -5px; }
   .bar-value { font-size: 8px; }
-  .bar-axis-range { font-size: 7px; letter-spacing: -.1em; }
+  .bar-axis-range { font-size: 0.49em; letter-spacing: -.15em; font-weight: 900; }
   .bar-axis-position { font-size: 13px; letter-spacing: .02em; }
 
   .insight-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 6px; }
@@ -220,15 +220,15 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 
   .method-panel { grid-template-columns: 1fr; margin-top: 10px; }
   .method-panel > div { padding: 10px 26px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .method-panel > div:last-child { border-bottom: 0; }
+  .method-panel > div:last-child { border-bottom: 0; gap: 3px; padding: 17px 26px 6px;  }
   .method-panel > .dataset-parameters { border-top: 0; }
   .threshold-grid { gap: 5px; }
   .dataset-parameters { gap: 8px; padding-top: 12px; padding-bottom: 12px; }
-  .dataset-title { font-size: 7.5px; }
+  .dataset-title { font-size: 11px; }
   .dataset-parameter-grid { gap: 5px; }
   .dataset-parameter { padding-right: 9px; }
-  .dataset-parameter span { font-size: 6.5px; }
-  .dataset-parameter strong { margin-top: 5px; font-size: 13px; }
+  .dataset-parameter span { font-size: 10px; letter-spacing: 0em; font-weight: 700; }
+  .dataset-parameter strong { margin-top: 5px; font-size: 15px; }
   footer { flex-wrap: wrap; justify-content: center; padding-top: 16px; }
   .palette-rail { order: 3; flex-basis: 100%; justify-content: center; }
 }
