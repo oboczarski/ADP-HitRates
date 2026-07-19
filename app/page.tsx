@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 import {
   Area,
@@ -23,9 +23,37 @@ const trendData = [
   { range: "Round 1", overall: 63.5, QB: 83.3, RB: 61.9, WR: 62.8, TE: 50.0 },
   { range: "Round 2", overall: 47.9, QB: 75.0, RB: 45.7, WR: 42.1, TE: 47.7 },
   { range: "Round 3", overall: 25.5, QB: 46.7, RB: 15.6, WR: 22.2, TE: 39.0 },
-];
+] as const;
+
+type DraftRange = (typeof trendData)[number]["range"];
 
 const overallData = trendData.map(({ range, overall }) => ({ range, overall }));
+
+const statCardNotes = {
+  "Top 6": "Premium capital",
+  "Round 1": "Strong hit zone",
+  "Round 2": "Coin-flip range",
+  "Round 3": "High-risk range",
+} satisfies Record<DraftRange, string>;
+
+const statCardMobileNotes = {
+  "Top 6": "Premium",
+  "Round 1": "Strong",
+  "Round 2": "Coin flip",
+  "Round 3": "High risk",
+} satisfies Record<DraftRange, string>;
+
+const statCards = overallData.map((metric, index) => ({
+  ...metric,
+  note: statCardNotes[metric.range],
+  mobileNote: statCardMobileNotes[metric.range],
+  sequence: String(index + 1).padStart(2, "0"),
+}));
+
+type StatDialStyle = CSSProperties & {
+  "--arc-end": string;
+  "--arc-mid": string;
+};
 
 const positionGradients = {
   QB: ["#FFA947", "#FF916B", "#FF666B", "#F94095"],
@@ -99,7 +127,26 @@ function BarValueLabel({ x, y, width, value, index, seriesKey, compact }: { x?: 
   );
 }
 
-function GroupedAxisTick({ x, y, payload, compact }: any) {
+type GroupedAxisTickProps = {
+  x?: number;
+  y?: number;
+  payload?: { value?: string | number };
+  compact: boolean;
+};
+
+type TooltipDatum = {
+  dataKey?: string | number;
+  value?: string | number | null;
+  payload?: Record<string, unknown>;
+};
+
+type ChartTooltipProps = {
+  active?: boolean;
+  payload?: TooltipDatum[];
+  label?: string | number;
+};
+
+function GroupedAxisTick({ x, y, payload, compact }: GroupedAxisTickProps) {
   const labels = compact ? ["T6", "RD1", "RD2", "RD3"] : ["TOP·6", "RD·1", "RD·2", "RD·3"];
   const offsets = compact ? [-24, -8, 8, 24] : [-59, -20, 20, 59];
   const rangeY = compact ? 8 : 13;
@@ -109,26 +156,26 @@ function GroupedAxisTick({ x, y, payload, compact }: any) {
       {labels.map((label, index) => (
         <text key={label} x={offsets[index]} y={rangeY} textAnchor="middle" className="bar-axis-range">{label}</text>
       ))}
-      <text x={0} y={positionY} textAnchor="middle" className="bar-axis-position">{payload.value}</text>
+      <text x={0} y={positionY} textAnchor="middle" className="bar-axis-position">{payload?.value}</text>
     </g>
   );
 }
 
-function TrendTooltip({ active, payload, label }: any) {
+function TrendTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="chart-tooltip">
       <span className="tooltip-kicker">{label}</span>
-      {payload.filter((item: any, index: number, items: any[]) => (
-        items.findIndex((candidate: any) => candidate.dataKey === item.dataKey) === index
-      )).map((item: any) => {
+      {payload.filter((item, index, items) => (
+        items.findIndex((candidate) => candidate.dataKey === item.dataKey) === index
+      )).map((item) => {
         const position = String(item.dataKey);
         const shownValue = item.payload?.[`${position}Label`] ?? item.value;
         const color = position in positionGradients
           ? positionGradients[position as keyof typeof positionGradients][3]
           : "#d747ff";
         return (
-          <div className="tooltip-row" key={item.dataKey}>
+          <div className="tooltip-row" key={String(item.dataKey)}>
             <span><i style={{ background: color }} />{position}</span>
             <strong>{Number(shownValue).toFixed(1)}%</strong>
           </div>
@@ -138,18 +185,24 @@ function TrendTooltip({ active, payload, label }: any) {
   );
 }
 
-function BarTooltip({ active, payload, label }: any) {
+function BarTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   const names: Record<string, string> = { top6: "Top 6", round1: "Round 1", round2: "Round 2", round3: "Round 3" };
   return (
     <div className="chart-tooltip">
       <span className="tooltip-kicker">{label}</span>
-      {payload.filter((item: any) => item.value != null).map((item: any) => (
-        <div className="tooltip-row" key={item.dataKey}>
-          <span><i style={{ background: rangeColors[item.dataKey as keyof typeof rangeColors][2] }} />{names[item.dataKey]}</span>
-          <strong>{label === "QB" && item.dataKey === "top6" ? "NA" : `${Number(item.value).toFixed(1)}%`}</strong>
-        </div>
-      ))}
+      {payload.filter((item) => item.value != null).map((item) => {
+        const dataKey = String(item.dataKey);
+        const color = dataKey in rangeColors
+          ? rangeColors[dataKey as keyof typeof rangeColors][2]
+          : "#d747ff";
+        return (
+          <div className="tooltip-row" key={dataKey}>
+            <span><i style={{ background: color }} />{names[dataKey] ?? dataKey}</span>
+            <strong>{label === "QB" && dataKey === "top6" ? "NA" : `${Number(item.value).toFixed(1)}%`}</strong>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -181,24 +234,67 @@ export default function Home() {
           <div className="eyebrow"><span>CAREER HIT STUDY</span><i /></div>
           <h1>Draft capital has a<br /><em>measurable edge.</em></h1>
           <p>
-            Positional hit rates across eight rookie classes—tracking whether each
-            player cleared their position-specific fantasy threshold at least once.
+            Positional hit rates across eight rookie classes— Highlighting overall and positional hit probabilities across rookie draft ADP .
           </p>
         </section>
 
         <section className="stat-grid" aria-label="Overall hit probability summary">
-          {[
-            ["TOP 6", "75.0", "Premium capital"],
-            ["ROUND 1", "63.5", "Strong hit zone"],
-            ["ROUND 2", "47.9", "Coin-flip range"],
-            ["ROUND 3", "25.5", "High-risk range"],
-          ].map(([label, value, note], index) => (
-            <article className={`stat-card stat-${index + 1}`} key={label}>
-              <div className="stat-top"><span>{label}</span><i>0{index + 1}</i></div>
-              <div className="stat-value">{value}<small>%</small></div>
-              <div className="stat-note"><span />{note}</div>
-            </article>
-          ))}
+          {statCards.map(({ range, overall, note, mobileNote, sequence }, index) => {
+            const arcEnd = overall * 3.6;
+            const dialStyle = {
+              "--arc-end": `${arcEnd}deg`,
+              "--arc-mid": `${arcEnd / 2}deg`,
+            } as StatDialStyle;
+            const titleId = `stat-title-${index + 1}`;
+            const noteId = `stat-note-${index + 1}`;
+
+            return (
+              <article
+                className={`stat-card stat-${index + 1}`}
+                aria-labelledby={titleId}
+                key={range}
+              >
+                <div className="stat-top">
+                  <div className="stat-heading">
+                    <span className="stat-kicker">ADP RANGE</span>
+                    <strong id={titleId}>{range.toUpperCase()}</strong>
+                  </div>
+                  <span className="stat-index" aria-hidden="true"><i />{sequence}</span>
+                </div>
+
+                <div
+                  className="stat-dial"
+                  style={dialStyle}
+                  role="meter"
+                  aria-label={`${range} overall hit rate`}
+                  aria-describedby={noteId}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={overall}
+                  aria-valuetext={`${overall.toFixed(1)} percent`}
+                >
+                  <span className="stat-arc-glow" aria-hidden="true" />
+                  <span className="stat-arc" aria-hidden="true" />
+                  <span className="stat-arc-echo" aria-hidden="true" />
+                  <span className="stat-origin" aria-hidden="true" />
+                  <span className="stat-cap" aria-hidden="true" />
+                  <span className="stat-core" aria-hidden="true">
+                    <strong className="stat-value">{overall.toFixed(1)}<small>%</small></strong>
+                    <em>HIT RATE</em>
+                  </span>
+                </div>
+
+                <div className="stat-note" id={noteId}>
+                  <span className="stat-status" aria-hidden="true" />
+                  <strong>
+                    <span className="stat-note-desktop">{note}</span>
+                    <span className="stat-note-mobile">{mobileNote}</span>
+                  </strong>
+                  <small aria-hidden="true">0—100</small>
+                </div>
+              </article>
+            );
+          })}
         </section>
 
         <section className="panel overall-panel">
