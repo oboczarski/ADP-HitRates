@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 import {
   Area,
@@ -23,9 +23,29 @@ const trendData = [
   { range: "Round 1", overall: 63.5, QB: 83.3, RB: 61.9, WR: 62.8, TE: 50.0 },
   { range: "Round 2", overall: 47.9, QB: 75.0, RB: 45.7, WR: 42.1, TE: 47.7 },
   { range: "Round 3", overall: 25.5, QB: 46.7, RB: 15.6, WR: 22.2, TE: 39.0 },
-];
+] as const;
+
+type DraftRange = (typeof trendData)[number]["range"];
 
 const overallData = trendData.map(({ range, overall }) => ({ range, overall }));
+
+const statCardNotes = {
+  "Top 6": "Premium capital",
+  "Round 1": "Strong hit zone",
+  "Round 2": "Coin-flip range",
+  "Round 3": "High-risk range",
+} satisfies Record<DraftRange, string>;
+
+const statCards = overallData.map((metric, index) => ({
+  ...metric,
+  note: statCardNotes[metric.range],
+  sequence: String(index + 1).padStart(2, "0"),
+}));
+
+type StatDialStyle = CSSProperties & {
+  "--arc-end": string;
+  "--arc-mid": string;
+};
 
 const positionGradients = {
   QB: ["#FFA947", "#FF916B", "#FF666B", "#F94095"],
@@ -212,18 +232,59 @@ export default function Home() {
         </section>
 
         <section className="stat-grid" aria-label="Overall hit probability summary">
-          {[
-            ["TOP 6", "75.0", "Premium capital"],
-            ["ROUND 1", "63.5", "Strong hit zone"],
-            ["ROUND 2", "47.9", "Coin-flip range"],
-            ["ROUND 3", "25.5", "High-risk range"],
-          ].map(([label, value, note], index) => (
-            <article className={`stat-card stat-${index + 1}`} key={label}>
-              <div className="stat-top"><span>{label}</span><i>0{index + 1}</i></div>
-              <div className="stat-value">{value}<small>%</small></div>
-              <div className="stat-note"><span />{note}</div>
-            </article>
-          ))}
+          {statCards.map(({ range, overall, note, sequence }, index) => {
+            const arcEnd = overall * 3.6;
+            const dialStyle = {
+              "--arc-end": `${arcEnd}deg`,
+              "--arc-mid": `${arcEnd / 2}deg`,
+            } as StatDialStyle;
+            const titleId = `stat-title-${index + 1}`;
+            const noteId = `stat-note-${index + 1}`;
+
+            return (
+              <article
+                className={`stat-card stat-${index + 1}`}
+                aria-labelledby={titleId}
+                key={range}
+              >
+                <div className="stat-top">
+                  <div className="stat-heading">
+                    <span className="stat-kicker">ADP RANGE</span>
+                    <strong id={titleId}>{range.toUpperCase()}</strong>
+                  </div>
+                  <span className="stat-index" aria-hidden="true"><i />{sequence}</span>
+                </div>
+
+                <div
+                  className="stat-dial"
+                  style={dialStyle}
+                  role="meter"
+                  aria-label={`${range} overall hit rate`}
+                  aria-describedby={noteId}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={overall}
+                  aria-valuetext={`${overall.toFixed(1)} percent`}
+                >
+                  <span className="stat-arc-glow" aria-hidden="true" />
+                  <span className="stat-arc" aria-hidden="true" />
+                  <span className="stat-arc-echo" aria-hidden="true" />
+                  <span className="stat-origin" aria-hidden="true" />
+                  <span className="stat-cap" aria-hidden="true" />
+                  <span className="stat-core" aria-hidden="true">
+                    <strong className="stat-value">{overall.toFixed(1)}<small>%</small></strong>
+                    <em>HIT RATE</em>
+                  </span>
+                </div>
+
+                <div className="stat-note" id={noteId}>
+                  <span className="stat-status" aria-hidden="true" />
+                  <strong>{note}</strong>
+                  <small aria-hidden="true">0—100</small>
+                </div>
+              </article>
+            );
+          })}
         </section>
 
         <section className="panel overall-panel">
