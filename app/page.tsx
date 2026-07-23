@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   ComposedChart,
   LabelList,
   Line,
@@ -18,14 +15,44 @@ import {
   YAxis,
 } from "recharts";
 
+import QuadrantArcMatrix from "./components/QuadrantArcMatrix";
+
 const trendData = [
   { range: "Top 6", overall: 75.0, QB: null, RB: 75.0, WR: 73.7, TE: 100.0 },
   { range: "Round 1", overall: 63.5, QB: 83.3, RB: 61.9, WR: 62.8, TE: 50.0 },
   { range: "Round 2", overall: 47.9, QB: 75.0, RB: 45.7, WR: 42.1, TE: 47.7 },
   { range: "Round 3", overall: 25.5, QB: 46.7, RB: 15.6, WR: 22.2, TE: 39.0 },
-];
+] as const;
+
+type DraftRange = (typeof trendData)[number]["range"];
 
 const overallData = trendData.map(({ range, overall }) => ({ range, overall }));
+
+const statCardNotes = {
+  "Top 6": "Premium capital",
+  "Round 1": "Strong hit zone",
+  "Round 2": "Coin-flip range",
+  "Round 3": "High-risk range",
+} satisfies Record<DraftRange, string>;
+
+const statCardMobileNotes = {
+  "Top 6": "Premium",
+  "Round 1": "Strong",
+  "Round 2": "Coin flip",
+  "Round 3": "High risk",
+} satisfies Record<DraftRange, string>;
+
+const statCards = overallData.map((metric, index) => ({
+  ...metric,
+  note: statCardNotes[metric.range],
+  mobileNote: statCardMobileNotes[metric.range],
+  sequence: String(index + 1).padStart(2, "0"),
+}));
+
+type StatDialStyle = CSSProperties & {
+  "--arc-end": string;
+  "--arc-mid": string;
+};
 
 const positionGradients = {
   QB: ["#FFA947", "#FF916B", "#FF666B", "#F94095"],
@@ -40,27 +67,6 @@ const curveData = [
   { range: "Round 2", QB: 75.0, QBLabel: 75.0, RB: 39.0, RBLabel: 45.7, WR: 33.0, WRLabel: 42.1, TE: 45.0, TELabel: 47.7 },
   { range: "Round 3", QB: 43.9, QBLabel: 46.7, RB: 12.6, RBLabel: 15.6, WR: 20.0, WRLabel: 22.2, TE: 37.5, TELabel: 39.0 },
 ];
-
-const positionData = [
-  { position: "QB", top6: 10, round1: 83.3, round2: 75.0, round3: 46.7 },
-  { position: "RB", top6: 75.0, round1: 61.9, round2: 45.7, round3: 15.6 },
-  { position: "WR", top6: 73.7, round1: 62.8, round2: 42.1, round3: 22.2 },
-  { position: "TE", top6: 100.0, round1: 50.0, round2: 47.7, round3: 39.0 },
-];
-
-const rangeColors = {
-  top6: ["#172A55", "#0099FF", "#00DDFA"],
-  round1: ["#12342F", "#00B3A4", "#00FF99"],
-  round2: ["#321642", "#A74EFF", "#FF0AA5"],
-  round3: ["#3A1727", "#FF6B6B", "#FFB847"],
-};
-
-const rangeBorders = {
-  top6: ["#0099FF", "#00DDFA", "#B8FAFF"],
-  round1: ["#00B3A4", "#00FF99", "#B8FFE3"],
-  round2: ["#A74EFF", "#FF0AA5", "#FFA9E2"],
-  round3: ["#FF6B6B", "#FFB847", "#FFE0A3"],
-};
 
 function PercentLabel({ x, y, value, index, offsets = [] }: { x?: number; y?: number; value?: number; index?: number; offsets?: number[] }) {
   if (x == null || y == null || value == null) return null;
@@ -81,75 +87,38 @@ function CurvePercentLabel({ x, y, index, actuals }: { x?: number; y?: number; i
   );
 }
 
-function BarValueLabel({ x, y, width, value, index, seriesKey, compact }: { x?: number; y?: number; width?: number; value?: number; index?: number; seriesKey: string; compact: boolean }) {
-  if (x == null || y == null || width == null || value == null) return null;
-  const isNA = seriesKey === "top6" && index === 0;
-  const label = isNA ? "NA" : compact ? `${Math.round(Number(value))}%` : `${Number(value).toFixed(1)}%`;
-  const cx = x + width / 2;
-  const labelY = y - (compact ? 6 : 8);
-  return (
-    <text
-      x={cx}
-      y={labelY}
-      textAnchor="middle"
-      className={isNA ? "bar-value bar-value-na" : "bar-value"}
-    >
-      {label}
-    </text>
-  );
-}
+type TooltipDatum = {
+  dataKey?: string | number;
+  value?: string | number | null;
+  payload?: Record<string, unknown>;
+};
 
-function GroupedAxisTick({ x, y, payload, compact }: any) {
-  const labels = compact ? ["T6", "RD1", "RD2", "RD3"] : ["TOP·6", "RD·1", "RD·2", "RD·3"];
-  const offsets = compact ? [-24, -8, 8, 24] : [-59, -20, 20, 59];
-  const rangeY = compact ? 8 : 13;
-  const positionY = compact ? 24 : 38;
-  return (
-    <g transform={`translate(${x},${y})`}>
-      {labels.map((label, index) => (
-        <text key={label} x={offsets[index]} y={rangeY} textAnchor="middle" className="bar-axis-range">{label}</text>
-      ))}
-      <text x={0} y={positionY} textAnchor="middle" className="bar-axis-position">{payload.value}</text>
-    </g>
-  );
-}
+type ChartTooltipProps = {
+  active?: boolean;
+  payload?: TooltipDatum[];
+  label?: string | number;
+};
 
-function TrendTooltip({ active, payload, label }: any) {
+function TrendTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="chart-tooltip">
       <span className="tooltip-kicker">{label}</span>
-      {payload.filter((item: any, index: number, items: any[]) => (
-        items.findIndex((candidate: any) => candidate.dataKey === item.dataKey) === index
-      )).map((item: any) => {
+      {payload.filter((item, index, items) => (
+        items.findIndex((candidate) => candidate.dataKey === item.dataKey) === index
+      )).map((item) => {
         const position = String(item.dataKey);
         const shownValue = item.payload?.[`${position}Label`] ?? item.value;
         const color = position in positionGradients
           ? positionGradients[position as keyof typeof positionGradients][3]
           : "#d747ff";
         return (
-          <div className="tooltip-row" key={item.dataKey}>
+          <div className="tooltip-row" key={String(item.dataKey)}>
             <span><i style={{ background: color }} />{position}</span>
             <strong>{Number(shownValue).toFixed(1)}%</strong>
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function BarTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  const names: Record<string, string> = { top6: "Top 6", round1: "Round 1", round2: "Round 2", round3: "Round 3" };
-  return (
-    <div className="chart-tooltip">
-      <span className="tooltip-kicker">{label}</span>
-      {payload.filter((item: any) => item.value != null).map((item: any) => (
-        <div className="tooltip-row" key={item.dataKey}>
-          <span><i style={{ background: rangeColors[item.dataKey as keyof typeof rangeColors][2] }} />{names[item.dataKey]}</span>
-          <strong>{label === "QB" && item.dataKey === "top6" ? "NA" : `${Number(item.value).toFixed(1)}%`}</strong>
-        </div>
-      ))}
     </div>
   );
 }
@@ -174,31 +143,80 @@ export default function Home() {
             <span className="brand-mark"><i /><i /><i /></span>
             <span>ADP / OUTCOMES</span>
           </div>
-          <div className="sample-badge"><span /> 2015-2018 &amp; 2020-2023 · RDs 1–3 · 1QB ADP</div>
+          <div className="sample-badge" aria-label="Sample: 2015 to 2018 and 2020 to 2023; Rounds 1 to 3; 1QB ADP">
+            <i className="sample-status-dot" aria-hidden="true" />
+            <div>
+              <strong>2015-2018 &amp; 2020-2023</strong>
+              <small>RDs 1–3<em>·</em>1QB ADP</small>
+            </div>
+          </div>
         </header>
 
         <section className="hero">
           <div className="eyebrow"><span>CAREER HIT STUDY</span><i /></div>
           <h1>Draft capital has a<br /><em>measurable edge.</em></h1>
           <p>
-            Positional hit rates across eight rookie classes—tracking whether each
-            player cleared their position-specific fantasy threshold at least once.
+            Positional hit rates across eight rookie classes— Highlighting overall and positional hit probabilities across rookie draft ADP .
           </p>
         </section>
 
         <section className="stat-grid" aria-label="Overall hit probability summary">
-          {[
-            ["TOP 6", "75.0", "Premium capital"],
-            ["ROUND 1", "63.5", "Strong hit zone"],
-            ["ROUND 2", "47.9", "Coin-flip range"],
-            ["ROUND 3", "25.5", "High-risk range"],
-          ].map(([label, value, note], index) => (
-            <article className={`stat-card stat-${index + 1}`} key={label}>
-              <div className="stat-top"><span>{label}</span><i>0{index + 1}</i></div>
-              <div className="stat-value">{value}<small>%</small></div>
-              <div className="stat-note"><span />{note}</div>
-            </article>
-          ))}
+          {statCards.map(({ range, overall, note, mobileNote, sequence }, index) => {
+            const arcEnd = overall * 3.6;
+            const dialStyle = {
+              "--arc-end": `${arcEnd}deg`,
+              "--arc-mid": `${arcEnd / 2}deg`,
+            } as StatDialStyle;
+            const titleId = `stat-title-${index + 1}`;
+            const noteId = `stat-note-${index + 1}`;
+
+            return (
+              <article
+                className={`stat-card stat-${index + 1}`}
+                aria-labelledby={titleId}
+                key={range}
+              >
+                <div className="stat-top">
+                  <div className="stat-heading">
+                    <span className="stat-kicker">ADP RANGE</span>
+                    <strong id={titleId}>{range.toUpperCase()}</strong>
+                  </div>
+                  <span className="stat-index" aria-hidden="true"><i />{sequence}</span>
+                </div>
+
+                <div
+                  className="stat-dial"
+                  style={dialStyle}
+                  role="meter"
+                  aria-label={`${range} overall hit rate`}
+                  aria-describedby={noteId}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={overall}
+                  aria-valuetext={`${overall.toFixed(1)} percent`}
+                >
+                  <span className="stat-arc-glow" aria-hidden="true" />
+                  <span className="stat-arc" aria-hidden="true" />
+                  <span className="stat-arc-echo" aria-hidden="true" />
+                  <span className="stat-origin" aria-hidden="true" />
+                  <span className="stat-cap" aria-hidden="true" />
+                  <span className="stat-core" aria-hidden="true">
+                    <strong className="stat-value">{overall.toFixed(1)}<small>%</small></strong>
+                    <em>HIT RATE</em>
+                  </span>
+                </div>
+
+                <div className="stat-note" id={noteId}>
+                  <span className="stat-status" aria-hidden="true" />
+                  <strong>
+                    <span className="stat-note-desktop">{note}</span>
+                    <span className="stat-note-mobile">{mobileNote}</span>
+                  </strong>
+                  <small aria-hidden="true">0—100</small>
+                </div>
+              </article>
+            );
+          })}
         </section>
 
         <section className="panel overall-panel">
@@ -316,69 +334,32 @@ export default function Home() {
         </section>
 
         <section className="analysis-grid">
-          <article className="panel comparison-panel">
-            <div className="panel-header compact-header">
-              <div>
-                <span className="section-index">03 / RANGE COMPARISON</span>
-                <h2>Positional hit-rate spectrum</h2>
-                <p>Bars visualize positional variance across ADP</p>
-              </div>
-              <div className="range-legend" aria-label="ADP range legend">
-                {Object.entries({ top6: "TOP 6", round1: "RD 1", round2: "RD 2", round3: "RD 3" }).map(([key, label]) => (
-                  <span key={key}><i style={{ background: `linear-gradient(90deg, ${rangeColors[key as keyof typeof rangeColors][0]}, ${rangeColors[key as keyof typeof rangeColors][2]})` }} />{label}</span>
-                ))}
+          <article className="panel comparison-panel matrix-panel">
+            <div className="matrix-card-chrome">
+              <div className="matrix-card-number">03</div>
+              <div className="matrix-card-heading">
+                <div className="matrix-card-title-row">
+                  <h2>Quadrant Arc Matrix</h2>
+                  <span className="matrix-card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m14.31 8 5.74 9.94" />
+                      <path d="M9.69 8h11.48" />
+                      <path d="m7.38 12 5.74-9.94" />
+                      <path d="M9.69 16 3.95 6.06" />
+                      <path d="M14.31 16H2.83" />
+                      <path d="m16.62 12-5.74 9.94" />
+                    </svg>
+                  </span>
+                </div>
+                <p>Four position quadrants, each carrying four nested ADP arcs on a shared 0–100% scale.</p>
               </div>
             </div>
-            <div className="bar-chart" role="img" aria-label="Grouped vertical bar chart comparing hit rates by position and ADP range">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={positionData} margin={compactBars ? { top: 8, right: 9, bottom: 3, left: 0 } : { top: 45, right: 18, bottom: 5, left: 0 }} barCategoryGap="22%" barGap={compactBars ? 2 : 7}>
-                  <defs>
-                    {Object.entries(rangeColors).map(([key, colors]) => (
-                      <linearGradient id={`bar-${key}`} key={key} x1="0%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" stopColor={colors[0]} stopOpacity=".10" />
-                        <stop offset="54%" stopColor={colors[1]} stopOpacity=".18" />
-                        <stop offset="100%" stopColor={colors[2]} stopOpacity=".26" />
-                      </linearGradient>
-                    ))}
-                    {Object.entries(rangeBorders).map(([key, colors]) => (
-                      <linearGradient id={`bar-border-${key}`} key={`border-${key}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" stopColor={colors[0]} />
-                        <stop offset="55%" stopColor={colors[1]} />
-                        <stop offset="100%" stopColor={colors[2]} />
-                      </linearGradient>
-                    ))}
-                    <linearGradient id="bar-na" x1="0%" y1="100%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="#343A49" stopOpacity=".18" />
-                      <stop offset="100%" stopColor="#8992A5" stopOpacity=".34" />
-                    </linearGradient>
-                    <linearGradient id="bar-border-na" x1="0%" y1="100%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="#687184" stopOpacity=".35" />
-                      <stop offset="100%" stopColor="#C0C7D4" stopOpacity=".62" />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="rgba(255,255,255,.065)" strokeDasharray="2 9" />
-                  <XAxis dataKey="position" axisLine={false} tickLine={false} height={compactBars ? 34 : 58} interval={0} tick={<GroupedAxisTick compact={compactBars} />} />
-                  <YAxis domain={[0, 110]} ticks={[0, 25, 50, 75, 100]} axisLine={false} tickLine={false} width={compactBars ? 35 : 42} tickFormatter={(v) => `${v}%`} tick={{ fill: "#626b84", fontSize: compactBars ? 9 : 10 }} />
-                  <Tooltip content={<BarTooltip />} cursor={{ fill: "rgba(255,255,255,.025)" }} />
-                  {Object.keys(rangeColors).map((key) => (
-                    <Bar key={key} dataKey={key} radius={[10, 10, 3, 3]} barSize={compactBars ? 14 : 32} isAnimationActive={false}>
-                      {positionData.map((entry, index) => {
-                        const isNA = key === "top6" && index === 0;
-                        return (
-                          <Cell
-                            key={`${key}-${entry.position}`}
-                            fill={isNA ? "url(#bar-na)" : `url(#bar-${key})`}
-                            stroke={isNA ? "url(#bar-border-na)" : `url(#bar-border-${key})`}
-                            strokeWidth={compactBars ? (isNA ? 0.65 : 1) : (isNA ? 1.65 : 2.4)}
-                          />
-                        );
-                      })}
-                      <LabelList dataKey={key} content={<BarValueLabel seriesKey={key} compact={compactBars} />} />
-                    </Bar>
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="matrix-insight-pill">
+              <span>SIGNAL</span>
+              Premium capital dominates every available position profile.
             </div>
+            <QuadrantArcMatrix data={trendData} gradients={positionGradients} />
             <div className="chart-footnote"><span>NA</span> No QBs inside the Top 6 of 1QB ADP during the sample period</div>
           </article>
 
@@ -406,10 +387,26 @@ export default function Home() {
           </aside>
         </section>
 
-        <section className="method-panel">
-          <div className="method-heading">
+        <section className="method-panel" aria-labelledby="study-frame-title">
+          <div className="dataset-parameters">
             <span className="section-index">05 / STUDY FRAME</span>
-            <h2>What counts as a hit?</h2>
+            <span className="dataset-title">ADP DATASET PARAMETERS</span>
+            <div className="dataset-parameter-grid">
+              {[
+                ["SCORING TYPE", "PPR", "#ff0aa5"],
+                ["LEAGUE SIZE", "12-teams", "#00FF99"],
+                ["LEAGUE FORMAT", "1QB", "#0099FF"],
+              ].map(([label, value, color]) => (
+                <div className="dataset-parameter" key={label}>
+                  <span>{label}</span>
+                  <strong style={{ color }}>{value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="method-heading">
+            <span className="method-segment-label">HIT DEFINITION</span>
+            <h2 id="study-frame-title">What counts as a hit?</h2>
           </div>
           <div className="method-definition">
             <span>CAREER RULE</span>
@@ -431,21 +428,6 @@ export default function Home() {
           <div className="benchmark-copy">
             <span>BENCHMARK</span>
             <p>Thresholds derived from the average minimum for <strong>QB2, RB2, WR2 and TE1</strong> PPR finishes.</p>
-          </div>
-          <div className="dataset-parameters">
-            <span className="dataset-title">ADP DATASET PARAMETERS</span>
-            <div className="dataset-parameter-grid">
-              {[
-                ["SCORING TYPE", "PPR", "#ff0aa5"],
-                ["LEAGUE SIZE", "12-teams", "#00FF99"],
-                ["LEAGUE FORMAT", "1QB", "#0099FF"],
-              ].map(([label, value, color]) => (
-                <div className="dataset-parameter" key={label}>
-                  <span>{label}</span>
-                  <strong style={{ color }}>{value}</strong>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 

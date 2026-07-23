@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Framework and build output
+.next/
+out/
+dist/
+build/
+next-env.d.ts
+.vinext/
+.wrangler/
+.sites-runtime/
+
+# Test and tool output
+coverage/
+.netlify/
+
+# Local environment files
+.env*
+!.env.example
+
+# Logs and OS metadata
+*.log
+npm-debug.log*
+.DS_Store
