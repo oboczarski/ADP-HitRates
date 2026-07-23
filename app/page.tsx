@@ -355,10 +355,6 @@ export default function Home() {
                 <p>Four position quadrants, each carrying four nested ADP arcs on a shared 0–100% scale.</p>
               </div>
             </div>
-            <div className="matrix-insight-pill">
-              <span>SIGNAL</span>
-              Premium capital dominates every available position profile.
-            </div>
             <QuadrantArcMatrix data={trendData} gradients={positionGradients} />
             <div className="chart-footnote"><span>NA</span> No QBs inside the Top 6 of 1QB ADP during the sample period</div>
           </article>
