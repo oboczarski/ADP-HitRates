@@ -312,7 +312,7 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .section-index { color: #656f89; font-size: 11px; letter-spacing: .21em; font-weight: 850; }
 .panel-header h2 { font-size: 24px; line-height: 1.1; margin: 9px 0 7px; letter-spacing: -.025em; }
 .panel-header p { margin: 0; color: #747e96; font-size: 12px; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
+.legend { display: flex; gap: 10px; flex-wrap: nowrap; justify-content: flex-end; }
 
 .legend span { 
   display: flex; 
