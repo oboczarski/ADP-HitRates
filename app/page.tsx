@@ -268,7 +268,7 @@ export default function Home() {
             </div>
             <div className="legend" aria-label="Position legend">
               {Object.entries(positionGradients).map(([position, colors]) => (
-                <span key={position}><i className="gradient-legend-mark" style={{ background: `linear-gradient(90deg, ${colors.join(",")})`, boxShadow: `0 0 14px ${colors[3]}` }} />{position}</span>
+                <span key={position}><i className="gradient-legend-mark" style={{ background: `linear-gradient(270deg, ${colors.join(",")})`, boxShadow: `0 0 14px ${colors[3]}` }} />{position}</span>
               ))}
             </div>
           </div>

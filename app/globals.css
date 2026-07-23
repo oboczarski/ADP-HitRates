@@ -580,6 +580,53 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 }
 
 @media (min-width: 901px) {
+  .dashboard-shell {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "topbar topbar"
+      "hero hero"
+      "stats stats"
+      "overall overall"
+      "trend matrix"
+      "method method"
+      "footer footer";
+    column-gap: 18px;
+  }
+
+  .topbar { grid-area: topbar; }
+  .hero { grid-area: hero; }
+  .stat-grid { grid-area: stats; }
+  .overall-panel {
+    grid-area: overall;
+    width: calc(100% - clamp(310px, 30%, 390px) - 18px);
+    margin-bottom: 0;
+    justify-self: start;
+  }
+  .trend-panel {
+    grid-area: trend;
+    min-width: 0;
+    margin-top: 18px;
+  }
+  .analysis-grid { display: contents; }
+  .matrix-panel {
+    grid-area: matrix;
+    min-width: 0;
+    min-height: 0;
+    margin-top: 18px;
+    padding: 24px 22px 18px;
+  }
+  .insight-stack {
+    grid-area: overall;
+    align-self: stretch;
+    justify-self: end;
+    width: clamp(310px, 30%, 390px);
+    min-width: 0;
+    gap: 7px;
+  }
+  .method-panel { grid-area: method; }
+  footer { grid-area: footer; }
+
   .trend-chart {
     height: 520px;
     margin-top: -16px;
@@ -589,11 +636,128 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
     height: 346px;
     margin-top: -10px;
   }
+
+  .insight-stack .insight-hero {
+    padding: 19px 20px;
+  }
+
+  .insight-stack .signal-orbit {
+    margin: 8px 0 6px;
+  }
+
+  .insight-stack .signal-ring {
+    width: 120px;
+    height: 120px;
+  }
+
+  .insight-stack .signal-ring::before {
+    inset: 8px;
+  }
+
+  .insight-stack .signal-ring span {
+    font-size: 31px;
+  }
+
+  .insight-stack .signal-ring small {
+    margin-top: -9px;
+    font-size: 15px;
+  }
+
+  .insight-stack .insight-hero h2 {
+    margin: 2px 0 5px;
+    font-size: 20px;
+  }
+
+  .insight-stack .insight-hero > p {
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+
+  .insight-stack .signal-scale {
+    gap: 6px;
+    margin-top: 11px;
+  }
+
+  .insight-stack .signal-scale > span {
+    padding-bottom: 5px;
+  }
+
+  .insight-stack .mini-insight {
+    grid-template-columns: 72px 1fr;
+    min-height: 68px;
+    gap: 9px;
+    padding: 10px 12px;
+  }
+
+  .insight-stack .mini-number {
+    font-size: 20px;
+  }
+
+  .insight-stack .mini-insight strong {
+    font-size: 10px;
+  }
+
+  .insight-stack .mini-insight p {
+    margin-top: 3px;
+    font-size: 8px;
+    line-height: 1.3;
+  }
+
+  .matrix-card-chrome {
+    grid-template-columns: 32px 1fr;
+    gap: 12px;
+  }
+
+  .matrix-card-heading p {
+    font-size: 10px;
+  }
+
+  .matrix-insight-pill {
+    margin-top: 12px;
+  }
+
+  .matrix-shell {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    min-height: 0;
+    margin-top: 0;
+  }
+
+  .matrix-svg {
+    width: min(100%, 545px);
+    max-width: 545px;
+    max-height: 545px;
+    margin-right: -8px;
+    margin-left: auto;
+  }
+
+  .matrix-range-rail {
+    gap: 8px;
+    min-height: 210px;
+    margin-left: -23px;
+    padding-left: 0;
+  }
+
+  .matrix-range-rail span {
+    font-size: 11px;
+  }
+
+  .matrix-range-rail b {
+    font-size: 14px;
+  }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat-note small { display: none; }
+
+  .trend-panel .panel-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .trend-panel .legend {
+    justify-content: flex-start;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
