@@ -50,7 +50,7 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .sample-badge strong,
 .sample-badge small { display: block; line-height: 1.1; white-space: nowrap; }
 .sample-badge strong { color: #a8b0c2; font-size: 12px; letter-spacing: .12em; font-weight: 760; }
-.sample-badge small { color: #69748e; font-size: 9px; letter-spacing: .14em; font-weight: 760; }
+.sample-badge small { color: #69748e; font-size: 9px; letter-spacing: .14em; font-weight: 760; justify-self: center; }
 .sample-badge em { margin-inline: 7px; color: #00ddfa; font-style: normal; }
 
 .hero { padding: 66px 0 40px; position: relative; }
