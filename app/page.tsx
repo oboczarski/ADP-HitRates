@@ -5,10 +5,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   ComposedChart,
   LabelList,
   Line,
@@ -17,6 +14,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import QuadrantArcMatrix from "./components/QuadrantArcMatrix";
 
 const trendData = [
   { range: "Top 6", overall: 75.0, QB: null, RB: 75.0, WR: 73.7, TE: 100.0 },
@@ -69,27 +68,6 @@ const curveData = [
   { range: "Round 3", QB: 43.9, QBLabel: 46.7, RB: 12.6, RBLabel: 15.6, WR: 20.0, WRLabel: 22.2, TE: 37.5, TELabel: 39.0 },
 ];
 
-const positionData = [
-  { position: "QB", top6: 10, round1: 83.3, round2: 75.0, round3: 46.7 },
-  { position: "RB", top6: 75.0, round1: 61.9, round2: 45.7, round3: 15.6 },
-  { position: "WR", top6: 73.7, round1: 62.8, round2: 42.1, round3: 22.2 },
-  { position: "TE", top6: 100.0, round1: 50.0, round2: 47.7, round3: 39.0 },
-];
-
-const rangeColors = {
-  top6: ["#172A55", "#0099FF", "#00DDFA"],
-  round1: ["#12342F", "#00B3A4", "#00FF99"],
-  round2: ["#321642", "#A74EFF", "#FF0AA5"],
-  round3: ["#3A1727", "#FF6B6B", "#FFB847"],
-};
-
-const rangeBorders = {
-  top6: ["#0099FF", "#00DDFA", "#B8FAFF"],
-  round1: ["#00B3A4", "#00FF99", "#B8FFE3"],
-  round2: ["#A74EFF", "#FF0AA5", "#FFA9E2"],
-  round3: ["#FF6B6B", "#FFB847", "#FFE0A3"],
-};
-
 function PercentLabel({ x, y, value, index, offsets = [] }: { x?: number; y?: number; value?: number; index?: number; offsets?: number[] }) {
   if (x == null || y == null || value == null) return null;
   return (
@@ -109,31 +87,6 @@ function CurvePercentLabel({ x, y, index, actuals }: { x?: number; y?: number; i
   );
 }
 
-function BarValueLabel({ x, y, width, value, index, seriesKey, compact }: { x?: number; y?: number; width?: number; value?: number; index?: number; seriesKey: string; compact: boolean }) {
-  if (x == null || y == null || width == null || value == null) return null;
-  const isNA = seriesKey === "top6" && index === 0;
-  const label = isNA ? "NA" : compact ? `${Math.round(Number(value))}%` : `${Number(value).toFixed(1)}%`;
-  const cx = x + width / 2;
-  const labelY = y - (compact ? 6 : 8);
-  return (
-    <text
-      x={cx}
-      y={labelY}
-      textAnchor="middle"
-      className={isNA ? "bar-value bar-value-na" : "bar-value"}
-    >
-      {label}
-    </text>
-  );
-}
-
-type GroupedAxisTickProps = {
-  x?: number;
-  y?: number;
-  payload?: { value?: string | number };
-  compact: boolean;
-};
-
 type TooltipDatum = {
   dataKey?: string | number;
   value?: string | number | null;
@@ -145,21 +98,6 @@ type ChartTooltipProps = {
   payload?: TooltipDatum[];
   label?: string | number;
 };
-
-function GroupedAxisTick({ x, y, payload, compact }: GroupedAxisTickProps) {
-  const labels = compact ? ["T6", "RD1", "RD2", "RD3"] : ["TOP·6", "RD·1", "RD·2", "RD·3"];
-  const offsets = compact ? [-24, -8, 8, 24] : [-59, -20, 20, 59];
-  const rangeY = compact ? 8 : 13;
-  const positionY = compact ? 24 : 38;
-  return (
-    <g transform={`translate(${x},${y})`}>
-      {labels.map((label, index) => (
-        <text key={label} x={offsets[index]} y={rangeY} textAnchor="middle" className="bar-axis-range">{label}</text>
-      ))}
-      <text x={0} y={positionY} textAnchor="middle" className="bar-axis-position">{payload?.value}</text>
-    </g>
-  );
-}
 
 function TrendTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
@@ -178,28 +116,6 @@ function TrendTooltip({ active, payload, label }: ChartTooltipProps) {
           <div className="tooltip-row" key={String(item.dataKey)}>
             <span><i style={{ background: color }} />{position}</span>
             <strong>{Number(shownValue).toFixed(1)}%</strong>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function BarTooltip({ active, payload, label }: ChartTooltipProps) {
-  if (!active || !payload?.length) return null;
-  const names: Record<string, string> = { top6: "Top 6", round1: "Round 1", round2: "Round 2", round3: "Round 3" };
-  return (
-    <div className="chart-tooltip">
-      <span className="tooltip-kicker">{label}</span>
-      {payload.filter((item) => item.value != null).map((item) => {
-        const dataKey = String(item.dataKey);
-        const color = dataKey in rangeColors
-          ? rangeColors[dataKey as keyof typeof rangeColors][2]
-          : "#d747ff";
-        return (
-          <div className="tooltip-row" key={dataKey}>
-            <span><i style={{ background: color }} />{names[dataKey] ?? dataKey}</span>
-            <strong>{label === "QB" && dataKey === "top6" ? "NA" : `${Number(item.value).toFixed(1)}%`}</strong>
           </div>
         );
       })}
@@ -227,7 +143,13 @@ export default function Home() {
             <span className="brand-mark"><i /><i /><i /></span>
             <span>ADP / OUTCOMES</span>
           </div>
-          <div className="sample-badge"><span /> 2015-2018 &amp; 2020-2023 · RDs 1–3 · 1QB ADP</div>
+          <div className="sample-badge" aria-label="Sample: 2015 to 2018 and 2020 to 2023; Rounds 1 to 3; 1QB ADP">
+            <i className="sample-status-dot" aria-hidden="true" />
+            <div>
+              <strong>2015-2018 &amp; 2020-2023</strong>
+              <small>RDs 1–3<em>·</em>1QB ADP</small>
+            </div>
+          </div>
         </header>
 
         <section className="hero">
@@ -412,69 +334,32 @@ export default function Home() {
         </section>
 
         <section className="analysis-grid">
-          <article className="panel comparison-panel">
-            <div className="panel-header compact-header">
-              <div>
-                <span className="section-index">03 / RANGE COMPARISON</span>
-                <h2>Positional hit-rate spectrum</h2>
-                <p>Bars visualize positional variance across ADP</p>
-              </div>
-              <div className="range-legend" aria-label="ADP range legend">
-                {Object.entries({ top6: "TOP 6", round1: "RD 1", round2: "RD 2", round3: "RD 3" }).map(([key, label]) => (
-                  <span key={key}><i style={{ background: `linear-gradient(90deg, ${rangeColors[key as keyof typeof rangeColors][0]}, ${rangeColors[key as keyof typeof rangeColors][2]})` }} />{label}</span>
-                ))}
+          <article className="panel comparison-panel matrix-panel">
+            <div className="matrix-card-chrome">
+              <div className="matrix-card-number">03</div>
+              <div className="matrix-card-heading">
+                <div className="matrix-card-title-row">
+                  <h2>Quadrant Arc Matrix</h2>
+                  <span className="matrix-card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m14.31 8 5.74 9.94" />
+                      <path d="M9.69 8h11.48" />
+                      <path d="m7.38 12 5.74-9.94" />
+                      <path d="M9.69 16 3.95 6.06" />
+                      <path d="M14.31 16H2.83" />
+                      <path d="m16.62 12-5.74 9.94" />
+                    </svg>
+                  </span>
+                </div>
+                <p>Four position quadrants, each carrying four nested ADP arcs on a shared 0–100% scale.</p>
               </div>
             </div>
-            <div className="bar-chart" role="img" aria-label="Grouped vertical bar chart comparing hit rates by position and ADP range">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={positionData} margin={compactBars ? { top: 8, right: 9, bottom: 3, left: 0 } : { top: 45, right: 18, bottom: 5, left: 0 }} barCategoryGap="22%" barGap={compactBars ? 2 : 7}>
-                  <defs>
-                    {Object.entries(rangeColors).map(([key, colors]) => (
-                      <linearGradient id={`bar-${key}`} key={key} x1="0%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" stopColor={colors[0]} stopOpacity=".10" />
-                        <stop offset="54%" stopColor={colors[1]} stopOpacity=".18" />
-                        <stop offset="100%" stopColor={colors[2]} stopOpacity=".26" />
-                      </linearGradient>
-                    ))}
-                    {Object.entries(rangeBorders).map(([key, colors]) => (
-                      <linearGradient id={`bar-border-${key}`} key={`border-${key}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" stopColor={colors[0]} />
-                        <stop offset="55%" stopColor={colors[1]} />
-                        <stop offset="100%" stopColor={colors[2]} />
-                      </linearGradient>
-                    ))}
-                    <linearGradient id="bar-na" x1="0%" y1="100%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="#343A49" stopOpacity=".18" />
-                      <stop offset="100%" stopColor="#8992A5" stopOpacity=".34" />
-                    </linearGradient>
-                    <linearGradient id="bar-border-na" x1="0%" y1="100%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="#687184" stopOpacity=".35" />
-                      <stop offset="100%" stopColor="#C0C7D4" stopOpacity=".62" />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="rgba(255,255,255,.065)" strokeDasharray="2 9" />
-                  <XAxis dataKey="position" axisLine={false} tickLine={false} height={compactBars ? 34 : 58} interval={0} tick={<GroupedAxisTick compact={compactBars} />} />
-                  <YAxis domain={[0, 110]} ticks={[0, 25, 50, 75, 100]} axisLine={false} tickLine={false} width={compactBars ? 35 : 42} tickFormatter={(v) => `${v}%`} tick={{ fill: "#626b84", fontSize: compactBars ? 9 : 10 }} />
-                  <Tooltip content={<BarTooltip />} cursor={{ fill: "rgba(255,255,255,.025)" }} />
-                  {Object.keys(rangeColors).map((key) => (
-                    <Bar key={key} dataKey={key} radius={[10, 10, 3, 3]} barSize={compactBars ? 14 : 32} isAnimationActive={false}>
-                      {positionData.map((entry, index) => {
-                        const isNA = key === "top6" && index === 0;
-                        return (
-                          <Cell
-                            key={`${key}-${entry.position}`}
-                            fill={isNA ? "url(#bar-na)" : `url(#bar-${key})`}
-                            stroke={isNA ? "url(#bar-border-na)" : `url(#bar-border-${key})`}
-                            strokeWidth={compactBars ? (isNA ? 0.65 : 1) : (isNA ? 1.65 : 2.4)}
-                          />
-                        );
-                      })}
-                      <LabelList dataKey={key} content={<BarValueLabel seriesKey={key} compact={compactBars} />} />
-                    </Bar>
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="matrix-insight-pill">
+              <span>SIGNAL</span>
+              Premium capital dominates every available position profile.
             </div>
+            <QuadrantArcMatrix data={trendData} gradients={positionGradients} />
             <div className="chart-footnote"><span>NA</span> No QBs inside the Top 6 of 1QB ADP during the sample period</div>
           </article>
 
@@ -502,10 +387,26 @@ export default function Home() {
           </aside>
         </section>
 
-        <section className="method-panel">
-          <div className="method-heading">
+        <section className="method-panel" aria-labelledby="study-frame-title">
+          <div className="dataset-parameters">
             <span className="section-index">05 / STUDY FRAME</span>
-            <h2>What counts as a hit?</h2>
+            <span className="dataset-title">ADP DATASET PARAMETERS</span>
+            <div className="dataset-parameter-grid">
+              {[
+                ["SCORING TYPE", "PPR", "#ff0aa5"],
+                ["LEAGUE SIZE", "12-teams", "#00FF99"],
+                ["LEAGUE FORMAT", "1QB", "#0099FF"],
+              ].map(([label, value, color]) => (
+                <div className="dataset-parameter" key={label}>
+                  <span>{label}</span>
+                  <strong style={{ color }}>{value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="method-heading">
+            <span className="method-segment-label">HIT DEFINITION</span>
+            <h2 id="study-frame-title">What counts as a hit?</h2>
           </div>
           <div className="method-definition">
             <span>CAREER RULE</span>
@@ -527,21 +428,6 @@ export default function Home() {
           <div className="benchmark-copy">
             <span>BENCHMARK</span>
             <p>Thresholds derived from the average minimum for <strong>QB2, RB2, WR2 and TE1</strong> PPR finishes.</p>
-          </div>
-          <div className="dataset-parameters">
-            <span className="dataset-title">ADP DATASET PARAMETERS</span>
-            <div className="dataset-parameter-grid">
-              {[
-                ["SCORING TYPE", "PPR", "#ff0aa5"],
-                ["LEAGUE SIZE", "12-teams", "#00FF99"],
-                ["LEAGUE FORMAT", "1QB", "#0099FF"],
-              ].map(([label, value, color]) => (
-                <div className="dataset-parameter" key={label}>
-                  <span>{label}</span>
-                  <strong style={{ color }}>{value}</strong>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
