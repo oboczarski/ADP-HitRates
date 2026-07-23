@@ -260,16 +260,18 @@ export default function Home() {
         </section>
 
         <section className="panel trend-panel">
-          <div className="panel-header">
-            <div>
-              <span className="section-index">02 / POSITIONAL CURVES</span>
+          <div className="trend-card-chrome">
+            <div className="trend-card-number">02</div>
+            <div className="trend-card-heading">
               <h2>Hit-rate descent by ADP</h2>
-              <p>Each line follows one position as draft investment declines.</p>
-            </div>
-            <div className="legend" aria-label="Position legend">
-              {Object.entries(positionGradients).map(([position, colors]) => (
-                <span key={position}><i className="gradient-legend-mark" style={{ background: `linear-gradient(270deg, ${colors.join(",")})`, boxShadow: `0 0 14px ${colors[3]}` }} />{position}</span>
-              ))}
+              <div className="trend-card-meta-row">
+                <p>Each line follows one position as draft investment declines.</p>
+                <div className="legend" aria-label="Position legend">
+                  {Object.entries(positionGradients).map(([position, colors]) => (
+                    <span key={position}><i className="gradient-legend-mark" style={{ background: `linear-gradient(270deg, ${colors.join(",")})`, boxShadow: `0 0 14px ${colors[3]}` }} />{position}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
           <div className="trend-chart" role="img" aria-label="Line chart showing positional hit rate by ADP range">
