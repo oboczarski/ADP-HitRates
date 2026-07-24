@@ -642,7 +642,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 
   .method-panel > .dataset-parameters > .section-index {
     position: absolute;
-    top: -33px;
+    top: -30px;
     left: 5px;
     display: inline-flex;
     align-items: center;
