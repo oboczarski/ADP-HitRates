@@ -46,12 +46,12 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .brand-mark i:nth-child(1) { height: 13px; }.brand-mark i:nth-child(2) { height: 21px; }.brand-mark i:nth-child(3) { height: 18px; }
 .sample-badge { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 10px; color: #8992a8; font-weight: 750; text-align: right; }
 .sample-status-dot { grid-row: 1 / 3; width: 1px; height: 27px; background: #00ff99; border-radius: 50%; box-shadow: 0px 0px 15px 1px #0f9, 0px 0px 4px 1px #0f9a; }
-.sample-badge > div { display: grid; gap: 3px; }
+.sample-badge > div { display: grid; gap: 3px; margin-left: 2px; }
 .sample-badge strong,
 .sample-badge small { display: block; line-height: 1.1; white-space: nowrap; }
 .sample-badge strong { color: #a8b0c2; font-size: 12px; letter-spacing: .12em; font-weight: 760; }
-.sample-badge small { color: #69748e; font-size: 9px; letter-spacing: .14em; font-weight: 760; justify-self: center; }
-.sample-badge em { margin-inline: 7px; color: #00ddfa; font-style: normal; }
+.sample-badge small { color: #69748e; font-size: 10.5px; letter-spacing: .14em; font-weight: 760; justify-self: center; }
+.sample-badge em { margin-inline: 9px; color: #00fafa; font-style: normal; font-size: 7px; }
 
 .hero { padding: 66px 0 40px; position: relative; }
 .hero::after { content: "HIT"; position: absolute; right: -4px; top: 10px; font-size: clamp(110px, 16vw, 230px); line-height: .9; font-weight: 900; letter-spacing: -.08em; color: rgba(255,255,255,.018); user-select: none; }
@@ -307,24 +307,26 @@ main { position: relative; overflow: hidden; min-height: 100vh; }
 .stat-note-mobile { display: none; }
 
 .panel { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(12,20,39,.86), rgba(4,9,20,.87)); box-shadow: inset 0 1px rgba(255,255,255,.04), 0 30px 100px rgba(0,0,0,.22); }
-.trend-panel { padding: 28px 30px 20px; }
+.trend-panel { padding: 28px 30px 10px; }
 .panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
 .section-index { color: #656f89; font-size: 11px; letter-spacing: .21em; font-weight: 850; }
 .panel-header h2 { font-size: 24px; line-height: 1.1; margin: 9px 0 7px; letter-spacing: -.025em; }
 .panel-header p { margin: 0; color: #747e96; font-size: 12px; }
-.trend-card-chrome { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: flex-start; gap: 16px; }
+.trend-card-chrome { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: flex-start; gap: 11px; margin-left: -4px; }
 .trend-card-number { min-height: 31px; color: #5e6884; border-right: 1px solid rgba(255,255,255,.09); font-family: var(--font-matrix-display), sans-serif; font-size: 10px; font-weight: 690; line-height: 31px; letter-spacing: .1em; }
 .trend-card-heading { min-width: 0; }
-.trend-card-heading h2 { margin: 9px 0 7px; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 24px; font-weight: 400; line-height: 1.1; letter-spacing: -.025em; }
+.trend-card-heading h2 { margin: 0px 0 7px; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 24px; font-weight: 400; line-height: 1.1; letter-spacing: -.025em; }
 .trend-card-meta-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 14px; }
 .trend-card-heading p { min-width: 0; margin: 0; color: #747e96; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 12px; font-weight: 400; line-height: 1.5; }
-.legend { display: flex; gap: 10px; flex-wrap: nowrap; justify-content: flex-end; }
+.legend { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: flex-end; margin-right: -16px; }
 
 .legend span { 
   display: flex; 
   align-items: center; 
-  gap: 8px; 
-  padding: 8px 10px; 
+  justify-content: center;
+  width: 60px;
+  gap: 6px; 
+  padding: 7px 8px; 
   border: 0px solid rgba(255,255,255,.08); 
   border-radius: 11px; 
   color: #D8DDE9; 
@@ -481,7 +483,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   .sample-badge > div { gap: 2px; }
   .sample-badge strong { font-size: 8px; letter-spacing: .025em; }
   .sample-badge small { font-size: 8px; letter-spacing: .04em; }
-  .sample-badge em { margin-inline: 4px; }
+  .sample-badge em { margin-inline: 6px; font-size: 6px; }
   .hero { padding: 17px 4px 12px; }
   .hero h1 { margin: 10px 0 11px; font-size: clamp(40px, 12.3vw, 48px); }
   .hero p { font-size: 12px; line-height: 1.5; letter-spacing: -.05em; }
@@ -636,7 +638,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 
   .trend-chart {
     height: 520px;
-    margin-top: -16px;
+    margin: -16px -22px 10px;
   }
 
   .overall-chart {
@@ -722,11 +724,10 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   }
 
   .matrix-svg {
-    width: min(100%, 545px);
-    max-width: 545px;
-    max-height: 545px;
-    margin-right: -8px;
-    margin-left: auto;
+    width: min(100%, 560px);
+    max-width: 560px;
+    max-height: 560px;
+    margin: -14px 22px -21px -9px;  
   }
 
   .matrix-range-rail {

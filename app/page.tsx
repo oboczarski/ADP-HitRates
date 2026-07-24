@@ -147,7 +147,7 @@ export default function Home() {
             <i className="sample-status-dot" aria-hidden="true" />
             <div>
               <strong>2015-2018 &amp; 2020-2023</strong>
-              <small>RDs 1–3<em>·</em>1QB ADP</small>
+              <small>RDs 1–3<em>✦</em>1QB ADP</small>
             </div>
           </div>
         </header>
@@ -223,7 +223,7 @@ export default function Home() {
           <div className="panel-header overall-header">
             <div>
               <span className="section-index">01 / OVERALL PROBABILITY</span>
-              <h2>Overall hit rate by draft range</h2>
+              <h2>Overall Hit Rate by Draft Range</h2>
               <p>Aggregate Hit Probability · 1QB ADP · Rounds 1–3</p>
             </div>
             <div className="overall-drop">
@@ -263,9 +263,9 @@ export default function Home() {
           <div className="trend-card-chrome">
             <div className="trend-card-number">02</div>
             <div className="trend-card-heading">
-              <h2>Hit-rate descent by ADP</h2>
+              <h2>Positional Hit Probabilities by Draft Range</h2>
               <div className="trend-card-meta-row">
-                <p>Each line follows one position as draft investment declines.</p>
+                <p>Positional Hit % · 1QB ADP · Rounds 1–3</p>
                 <div className="legend" aria-label="Position legend">
                   {Object.entries(positionGradients).map(([position, colors]) => (
                     <span key={position}><i className="gradient-legend-mark" style={{ background: `linear-gradient(270deg, ${colors.join(",")})`, boxShadow: `0 0 14px ${colors[3]}` }} />{position}</span>
@@ -341,7 +341,7 @@ export default function Home() {
               <div className="matrix-card-number">03</div>
               <div className="matrix-card-heading">
                 <div className="matrix-card-title-row">
-                  <h2>Quadrant Arc Matrix</h2>
+                  <h2>Positional Hit % Quadrant Matrix</h2>
                   <span className="matrix-card-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
@@ -354,7 +354,7 @@ export default function Home() {
                     </svg>
                   </span>
                 </div>
-                <p>Four position quadrants, each carrying four nested ADP arcs on a shared 0–100% scale.</p>
+                <p>Isolated position quadrants, carrying Hit-Rate arcs by range</p>
               </div>
             </div>
             <QuadrantArcMatrix data={trendData} gradients={positionGradients} />
