@@ -141,7 +141,7 @@ export default function Home() {
         <header className="topbar">
           <div className="brand">
             <span className="brand-mark"><i /><i /><i /></span>
-            <span>ADP / OUTCOMES</span>
+            <span>Dynasty Hub Research</span>
           </div>
           <div className="sample-badge" aria-label="Sample: 2015 to 2018 and 2020 to 2023; Rounds 1 to 3; 1QB ADP">
             <i className="sample-status-dot" aria-hidden="true" />
@@ -156,7 +156,7 @@ export default function Home() {
           <div className="eyebrow"><span>CAREER HIT STUDY</span><i /></div>
           <h1>Draft capital has a<br /><em>measurable edge.</em></h1>
           <p>
-            Positional hit rates across eight rookie classes— Highlighting overall and positional hit probabilities across rookie draft ADP .
+            Positional hit rates across eight rookie classes—highlighting overall and positional hit probabilities for players across rookie draft ADP.
           </p>
         </section>
 
