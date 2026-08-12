@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,12 +12,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const matrixBody = Manrope({
+  variable: "--font-matrix-body",
+  subsets: ["latin"],
+});
+
+const matrixDisplay = Space_Grotesk({
+  variable: "--font-matrix-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Starter Project",
-  description: "A clean starting point for building your site.",
-  other: {
-    "codex-preview": "development",
-  },
+  title: "Rookie ADP Hit Rates",
+  description:
+    "Fantasy football rookie hit rates by draft position and positional group.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -32,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${matrixBody.variable} ${matrixDisplay.variable} antialiased`}
       >
         {children}
       </body>
