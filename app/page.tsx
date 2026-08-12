@@ -154,7 +154,7 @@ export default function Home() {
 
         <section className="hero">
           <div className="eyebrow"><span>CAREER HIT STUDY</span><i /></div>
-          <h1>Draft capital has a<br /><em>measurable edge.</em></h1>
+          <h1>Player Career Hit Rates<br /><em>by Rookie ADP.</em></h1>
           <p>
             Positional hit rates across eight rookie classes—highlighting overall and positional hit probabilities for players across rookie draft ADP.
           </p>
